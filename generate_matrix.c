@@ -65,7 +65,7 @@ int write_row(int d, char* in_file, char* out_file,
 void print_help(char* prog_name)
 {
     printf("usage: %s %s", prog_name,
-      "meta%d.data %d.data OUT.csv DIMENSION A B\n"
+      "meta%d.data %d.data OUT.csv DIMENSION A B\n\n\n"
       "    Use %d to denote the numerical portion of the filename.\n"
       "    DIMENSION must be 128, 256, 512, 1024, 2048, 4096, or 8192 and A < B\n\n"
       "    Loads files A.data, (A+1).data, ..., B.data and\n"
