@@ -24,4 +24,5 @@ generate_matrix: generate_matrix.c pearson.h
 # using Pearson's hashing function.
 matrix_data: generate_matrix
 	@echo Sample parameters:
-	./generate_matrix 0 ./tests/payload%d.data tests/out.csv 1024 0 2 reverse_hash
+	rm -f reverse_hash data/out.csv
+	./generate_matrix NONE data/payload%d.data data/out.csv 8192 50 100 reverse_hash
