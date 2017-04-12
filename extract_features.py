@@ -73,7 +73,7 @@ def parse_email(email_fname,
     if include_html:
         payload = get_text(m)
     else:
-        payload = bs4.BeautifulSoup(get_text(m)).getText()
+        payload = bs4.BeautifulSoup(get_text(m), 'lxml').getText()
 
     # If desired, force case
     if case_insensitive:
@@ -94,7 +94,7 @@ def parse_email(email_fname,
     # Check for missing fields
     for k in datum:
         if datum[k] is None:
-            print(k, datum, fname)
+            print('Email', email_fname, 'is missing the header', k)
 
     # Get useful metadata
     datum['date'] = m['Date']
@@ -104,7 +104,7 @@ def parse_email(email_fname,
 # Load 1000 emails from CSDMC2010 dataset
 generate_files('data/payload{}.data', 
         ["spam/CSDMC2010_SPAM/TRAINING/TRAIN_{:05d}.eml".format(i) 
-                    for i in range(1000)],
+                    for i in range(4326 + 1)],
                include_html=False,
                case_insensitive=True,
                n_gram_lengths=[1, 2],
