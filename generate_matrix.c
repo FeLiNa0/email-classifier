@@ -16,38 +16,49 @@ int write_row(int d, char* in_file, char* out_file,
     FILE* input_fd;
     if (!(input_fd = fopen(in_file, "r"))) {
         printf("Input file %s: fopen failed\n", in_file);
+        perror("");
         return 1;
     }
 
     FILE* rainbow_fd;
     if (rainbow_table_file) {
-        if (!(rainbow_fd = fopen(rainbow_table_file, "w"))) {
+        if (!(rainbow_fd = fopen(rainbow_table_file, "a"))) {
             printf("Output file %s: fopen failed\n", rainbow_table_file);
+            perror("");
+            fclose(input_fd);
             return 1;
         }
     }
 
     // Add each line of the input file to the vector
+    int line_number = 0;
     while (fgets(line, sizeof(line), input_fd)) {
+        line_number++;
+
         // Remove newline
         line[strcspn(line, "\n")] = '\0';
 
         // Ignore empty lines and lines that start with //
-        if (line[0] != '\0' || (line[0] == '/' && line[1] == '/')) {
+        if (line[0] != '\0' && line[0] != '/' && line[1] != '/') {
             if (rainbow_table_file) {
-                fprintf(rainbow_fd, "%u    %s\n", hash(line), line);
+                fprintf(rainbow_fd, "%u    (%s:%d)    %s\n", hash(line), in_file, line_number, line);
             }
             vector[hash(line)]++;
         }
     }
 
     // Close the input file
+    if (rainbow_table_file) {
+        fclose(rainbow_fd);
+    }
+
     fclose(input_fd);
 
     // Open the output file
     FILE* output_fd;
     if (!(output_fd = fopen(out_file, "a"))) {
         printf("Output file %s: fopen failed\n", out_file);
+        perror("");
         return 1;
     }
 
