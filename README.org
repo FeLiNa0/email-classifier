@@ -1,14 +1,16 @@
 * Datasets
 Dataset metrics:
-- CSDMC2010       70M    4327  samples   (31.85% spam)
-- Spam Track      964M   92189 samples   (57.26% spam)
-- enron2          26M    5857  samples   (25.54% spam)
-- enron3          30M    5512  samples   (27.21% spam)
-- enron5          23M    5175  samples   (71.01% spam)  shares some with enron2
-- enron6          27M    6000  samples   (75.00% spam)
-- csmining        67M
-- lingspam        61M
-- PU              63M
+| Name        | Size   | Samples | Spam   |
+|-------------+--------+---------+--------|
+| CSDMC2010   |   70M  | 4327    | 31.85% |
+| Spam Track  |   964M | 92189   | 57.26% |
+| enron2      |   26M  | 5857    | 25.54% |
+| enron3      |   30M  | 5512    | 27.21% |
+| enron5      |   23M  | 5175    | 71.01% |
+| enron6      |   27M  | 6000    | 75.00% |
+| csmining    |   67M  |
+| lingspam    |   61M  |
+| PU          |   63M  |
 
 ** Duplicates
 All CSDMC2010 samples are unique.
@@ -32,12 +34,12 @@ from easy to hard.
 2. Convert to lowercase
 3. Split on whitespace AND/OR form all n-grams.
    This should produce either a list of words or a string.
-4. Form bag of words with dictionary of size `d` using the hashing trick:
+4. Form bag of words with dictionary of size $d$ using the hashing trick:
    for word in email_feature:
        vec[hash(word)] = 1
 
+
 * More Info on Datasets
-TODO SOURCES?
 enron, csmining, lingspam, and PU came from csmining.org
 
 Sources:
@@ -45,6 +47,9 @@ Sources:
 - enron3: kitchen-l  + BG (08/2004 - 07/2005)
 - enron5: beck-s     + SpamAssassin&HoneyPot (05/2001 - 07/2005)
 - enron6: lokay-m    + BG (08/2004 - 07/2005)
+
+#+BEGIN_COMMENT
+TODO SOURCES?
 
 * Misc
 - `enron1/ham/2825.2000-11-13.farmer.ham.txt` "i believe texas should re - establish itself as a republic and i can go to the barricades . now that gets my juices going ."
@@ -59,3 +64,4 @@ options:
 
 * Machine Learning!
 ten fold cross validation like (Androutsopoulos)
+#+END_COMMENT
