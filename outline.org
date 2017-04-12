@@ -1,0 +1,61 @@
+* Datasets
+Dataset metrics:
+- CSDMC2010       70M    4327  samples   (31.85% spam)
+- Spam Track      964M   92189 samples   (57.26% spam)
+- enron2          26M    5857  samples   (25.54% spam)
+- enron3          30M    5512  samples   (27.21% spam)
+- enron5          23M    5175  samples   (71.01% spam)  shares some with enron2
+- enron6          27M    6000  samples   (75.00% spam)
+- csmining        67M
+- lingspam        61M
+- PU              63M
+
+** Duplicates
+All CSDMC2010 samples are unique.
+There's 12291 duplicated samples in the Spam Track dataset
+and 5192 duplicated samples in the enron datasets.
+Also, the CSDMC2010 samples and the Spam Track samples are disjoint
+(this is based on a comparison of MD5 checksums, not the contents of each
+file; emails may appear in slightly different forms in each sample).
+
+I haven't check the last three datasets in as much detail.
+
+** Difficulty
+The CS Mining dataset is particularly interesting as it classifies
+its ham and spam samples into varying difficulty classes.
+I'm planning on simulating an 'adversarial' stream of emails by
+randomly generating a sequence of emails that ramps up in difficulty
+from easy to hard.
+
+* Mapping Variable-Length Emails to Vectors
+1. Parse as HTML and convert to plaintext
+2. Convert to lowercase
+3. Split on whitespace AND/OR form all n-grams.
+   This should produce either a list of words or a string.
+4. Form bag of words with dictionary of size `d` using the hashing trick:
+   for word in email_feature:
+       vec[hash(word)] = 1
+
+* More Info on Datasets
+TODO SOURCES?
+enron, csmining, lingspam, and PU came from csmining.org
+
+Sources:
+- enron2: kaminski-v + SpamAssassin&HoneyPot (05/2001 - 07/2005)
+- enron3: kitchen-l  + BG (08/2004 - 07/2005)
+- enron5: beck-s     + SpamAssassin&HoneyPot (05/2001 - 07/2005)
+- enron6: lokay-m    + BG (08/2004 - 07/2005)
+
+* Misc
+- `enron1/ham/2825.2000-11-13.farmer.ham.txt` "i believe texas should re - establish itself as a republic and i can go to the barricades . now that gets my juices going ."
+- 'New Mexico only appears in `spam/` in the enron1 dataset
+
+* Convert to Vectors
+options:
+- bag of words + more
+- bag of n-grams
+- bag of GloVes or word2vecs
+- paragraph vectors
+
+* Machine Learning!
+ten fold cross validation like (Androutsopoulos)
