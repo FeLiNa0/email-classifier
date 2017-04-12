@@ -40,7 +40,7 @@ insensitive) x (no HTML tags, include HTML tags)
 * Converting Emails to Lists of Features
 Every email document is converted to a *.data* feature file of the following form:
 
-#+BEGIN_CODE
+#+BEGIN_SRC
 1
 // Sample file. First line is the document's label. 
 // The rest of the non-commented lines are features.
@@ -50,7 +50,7 @@ successful
 SVM learning
 learning is
 is successful
-#+END_CODE
+#+END_SRC
 
 ** Implementation
 The Python script extract_features.py processes each *.eml* email file 
