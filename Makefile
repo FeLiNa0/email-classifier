@@ -26,3 +26,6 @@ matrix_data: generate_matrix
 	@echo Sample parameters:
 	rm -f reverse_hash data/out.csv
 	./generate_matrix NONE data/payload%d.data data/out.csv 8192 50 100 reverse_hash
+
+clean:
+	rm -f generate_matrix *reverse_hash data/*out.csv 
