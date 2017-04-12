@@ -3,6 +3,12 @@ form:
 
     >>> metadata_file, payload_file = generate_files(test_email)
     >>> print(payload_file)
+    ... // SPAM from <file_name>
+    ... 1
+    ... // Begin payload
+    ... metadata word 1
+    ... ...
+    ... metadata word q
     ... payload word 1
     ... ...
     ... payload word p
@@ -12,6 +18,11 @@ form:
 """
 import email
 import bs4
+
+
+# Disable UserWarnings from beautifulsoup
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module='bs4')
 
 
 stop_words = """
@@ -868,16 +879,28 @@ yours
 z""".split()
 
 
-def generate_files(out_fname_template, email_fnames,
+def generate_files(out_fname_template, email_fnames, label_file,
                    include_html=True,  # use bs4
                    case_insensitive=False,  # call .lower()
                    n_gram_lengths=[1],
                    normalize_whitespace=True,  # call ' '.join(.split())
                    by_character=False  # call .split() or not
                    ):
+    labels = dict()
+    with open(label_file) as f:
+        for label in f:
+            w = label.split(maxsplit=1)
+            if len(w) < 2:
+                continue
+            labels[w[1][:-1]] = w[0]
+
     for i, eml in enumerate(email_fnames):
-        if i % (len(email_fnames) // 10) == 0:
-            print('Processing', eml)
+        short_name = 'TRAIN_' + eml.split('TRAIN_')[-1]
+
+        is_spam = labels.get(short_name, None)
+
+        if True or i % (len(email_fnames) // 10) == 0:
+            print('Processing', eml, 'aka', short_name, 'spam or ham:', is_spam)
 
         datum = parse_email(
             eml,
@@ -885,9 +908,14 @@ def generate_files(out_fname_template, email_fnames,
             case_insensitive,
             n_gram_lengths,
             normalize_whitespace,
-            by_character)
+            by_character,
+            is_spam=is_spam)
         with open(out_fname_template.format(i), 'w') as f:
-            f.write('// Derived from {}\n'.format(eml))
+            # TODO change? write label somewhere else?
+            f.write(is_spam + '\n')
+            f.write('// {} email derived from {}\n'.format(
+                    'spam' if is_spam else 'ham', eml))
+            f.write('// Begin payload\n')
             for w in datum['payload']:
                 f.write(w + '\n')
 
@@ -901,6 +929,10 @@ def ngrams(words, lengths, joiner=' '):
 
 
 def get_text(m):
+    if type(m) is str:
+        return m
+    if type(m) is bytes:
+        return m
     if m.is_multipart():
         return get_text(m.get_payload(0))
     else:
@@ -912,14 +944,20 @@ def parse_email(email_fname,
                 case_insensitive=False,
                 n_gram_lengths=[1, 2],
                 normalize_whitespace=True,
-                by_character=False
+                by_character=False,
+                is_spam=False,
                 ):
 
     # Open email file
     m = email.parser.BytesParser().parse(open(email_fname, 'rb'))
     datum = {'from': m['From'],
-             'subject': m['Subject'],
+             'subject': m['Subject'],  # TODO how to get text?
+             'spam': is_spam
              }
+    if datum['subject'] is None:
+        datum['subject'] = ''
+    if type(datum['subject']) is email.header.Header:
+        datum['subject'] = datum['subject'].encode()
 
     payload = ''
 
@@ -927,10 +965,9 @@ def parse_email(email_fname,
     if include_html:
         payload = get_text(m)
     else:
-        try:
-            payload = bs4.BeautifulSoup(get_text(m), 'lxml').getText()
-        except UserWarning:
-            pass
+        payload = bs4.BeautifulSoup(get_text(m), 'lxml').getText()
+
+    payload = datum['subject'] + '\n\n' + payload
 
     # If desired, force case
     if case_insensitive:
@@ -959,10 +996,19 @@ def parse_email(email_fname,
 
 
 # Load 1000 emails from CSDMC2010 dataset
-generate_files('data/payload{}.data', 
-        ["spam/CSDMC2010_SPAM/TRAINING/TRAIN_{:05d}.eml".format(i) 
-                    for i in range(4326 + 1)],
+output = 'data/payload{}.data'
+emails = ["spam/CSDMC2010_SPAM/TRAINING/TRAIN_{:05d}.eml".format(i) for i in range(4326 + 1)]
+labels = 'spam/CSDMC2010_SPAM/SPAMTrain.label'
+# TODO generate_files should do as much as possible with each open .eml
+# only all it once
+generate_files(output, emails, labels,
                include_html=False,
                case_insensitive=True,
                n_gram_lengths=[1],
                by_character=False)
+
+generate_files('data/char{}.data', emails, labels,
+               include_html=True,
+               case_insensitive=False,
+               n_gram_lengths=[4],
+               by_character=True)

@@ -1,4 +1,5 @@
 #include <stdio.h> 
+#include <stdbool.h> 
 #include <string.h> 
 #include "pearson.h"
 
@@ -32,8 +33,13 @@ int write_row(int d, char* in_file, char* out_file,
 
     // Add each line of the input file to the vector
     int line_number = 0;
+    bool is_spam;
     while (fgets(line, sizeof(line), input_fd)) {
         line_number++;
+        if (line_number == 1) {
+            is_spam = line[0] == '1';
+            continue;
+        }
 
         // Remove newline
         line[strcspn(line, "\n")] = '\0';
@@ -63,8 +69,9 @@ int write_row(int d, char* in_file, char* out_file,
     }
 
     // Write each element of the vector to a row in the CSV file 
-    fprintf(output_fd, "%u", vector[0]);
-    for (int i = 1; i < d; i++) {
+    // First column is the label
+    fprintf(output_fd, "%d", is_spam ? 1 : 0);
+    for (int i = 0; i < d; i++) {
         fprintf(output_fd, ",%u", vector[i]);
     }
     fprintf(output_fd, "\n");
