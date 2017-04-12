@@ -8,11 +8,10 @@ download_data:
 features:
 	@echo Sample parameters:
 	python3 extract_features.py \
-		--ngram=5 --by-character \
+		--ngram=8,16 --by-character \
 		--exclude-html --case-sensitive \
-		CSDMC2010_SPAM/SPAMTrain.label CSDMC2010_SPAM/TRAINIG \
-		'./metatadata{}.data' './payload{}.data' './labels0-100.csv' \
-		0 100
+		'./tests/payload{}.data' 0 100 \
+		CSDMC2010_SPAM/TRAINING/* \
 
 # Compile matrix generator
 generate_matrix: generate_matrix.c pearson.h
@@ -25,9 +24,4 @@ generate_matrix: generate_matrix.c pearson.h
 # using Pearson's hashing function.
 matrix_data: generate_matrix
 	@echo Sample parameters:
-	./generate_matrix 0 tests/test%d.data tests/out.csv 1024 1 3 reverse_hash
-
-count_collisions:
-	@echo Total unique words and total unique hash values in the file "reverse_hash" are
-	sort reverse_hash | uniq | wc -l
-	sort reverse_hash | cut -d' ' -f1 | uniq | wc -l
+	./generate_matrix 0 ./tests/payload%d.data tests/out.csv 1024 0 2 reverse_hash
