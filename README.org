@@ -1,5 +1,13 @@
+#+BEGIN_COMMENT
+add:
+lots of time, why does this matter?
+how to pre-process online data?
+datasets, pre-processing, description of the vector space
+#+END_COMMENT
+
 * Datasets
-Dataset metrics:
+
+** Dataset Metrics
 | Name        | Size   | Samples | Spam   |
 |-------------+--------+---------+--------|
 | CSDMC2010   |   70M  | 4327    | 31.85% |
@@ -12,7 +20,7 @@ Dataset metrics:
 | lingspam    |   61M  |
 | PU          |   63M  |
 
-** Duplicates
+*** Duplicates
 All CSDMC2010 samples are unique.
 There's 12291 duplicated samples in the Spam Track dataset
 and 5192 duplicated samples in the enron datasets.
@@ -22,27 +30,28 @@ file; emails may appear in slightly different forms in each sample).
 
 I haven't check the last three datasets in as much detail.
 
-** Difficulty
+*** Difficulty
 The CS Mining dataset is particularly interesting as it classifies
 its ham and spam samples into varying difficulty classes.
 I'm planning on simulating an 'adversarial' stream of emails by
 randomly generating a sequence of emails that ramps up in difficulty
 from easy to hard.
 
-* Mapping Variable-Length Emails to Vectors
-This code generates 24 datasets, one for each feature type. 
+** Mapping Variable-Length Emails to Vectors
+This code generates 24 datasets, one for each feature type.
 A feature is a word or sequence of characters in a document.
 
 Feature types include:
 (1-gram, 2-gram, 3-gram) x (by character, by word) x (case sensitive, case
 insensitive) x (no HTML tags, include HTML tags)
 
-* Converting Emails to Lists of Features
+** Converting Emails to Lists of Features
 Every email document is converted to a *.data* feature file of the following form:
 
 #+BEGIN_SRC
 1
-// Sample file. First line is the document's label. 
+// Sample file. First line is the document's label:
+// 1 if spam, 0 if ham
 // The rest of the non-commented lines are features.
 SVM
 is
@@ -52,8 +61,8 @@ learning is
 is successful
 #+END_SRC
 
-** Implementation
-The Python script extract_features.py processes each *.eml* email file 
+*** Implementation
+The Python script =extract_features.py= processes each *.eml* email file
 by creating a *payloadN.data* file where N is an integer from 1 to the number
 of emails. The script extracts features by applying one or more of the
 following operations to the email payload and subject:
@@ -64,7 +73,7 @@ following operations to the email payload and subject:
 - Form n-grams based on either words or characters
 - Adds sender as a feature (verbatim)
 
-* Converting Lists of Features to Vectors
+** Converting Lists of Features to Vectors
 Every *.data* feature file is converted to a sparse matrix of the following
 form:
 
@@ -76,22 +85,22 @@ Where u is the number of unique features, n is the number of documents and
 count is either the number of times the feature appears, or a number with an
 absolute value less than the number of times the feature appears.
 
-** Dimensionality Reduction
+*** Dimensionality Reduction
 If desired, the sparse matrix can be modified to contain less columns than
 the number of unique features.
 In this case, there may be collisions: different features may have the same
 feature index.
 
-The script count_collisions.sh can count the number of features that have
+The script =count_collisions.sh= can count the number of features that have
 the same index in the sparse matrix.
 
-** Finding Features Given a Feature Index
+**** Finding Features Given a Feature Index
 A rainbow table is created for the entire corpus.
 This file maps features and document indices to the feature's index in the
 sparse matrix.
 
-** Implementation
-The C program generate_matrix.c takes
+*** Implementation
+The C program =generate_matrix.c= takes
 
 #+BEGIN_COMMENT
 C program (output file, rainbow hash output, payload names, range of file IDs (1-100, 101-200)
@@ -101,7 +110,7 @@ should also generate different testing sets (cross-validation...)
 Scan each .data file and add every feature to a bag of words.
 Write the bag of words as a sparse matrix to a .dat file.
 
-** Bag of Words
+**** Bag of Words
 Maps features (word n-grams or character n-grams)
 to R^u
 
@@ -110,21 +119,21 @@ generates sparse matrix of size O(nu) where n is the number of docs
 n is the number of docs
 u is the number of unique features
 
-vector[hash(f)]++ 
-is replaced with 
+vector[hash(f)]++
+is replaced with
 add_or_increment(vector, f)
 
 keep array of (hash value, doc, index, count) of length U
 
 hash and hash2 are different hash functions
-  (FarmHash, SipHash, Pearson's Hash) 
+  (FarmHash, SipHash, Pearson's Hash)
 
 to map feature -> index:
  returns an index from 1 to U
 
  hash value = hash(feature)
- lookup feature's (hash value % current size) in array 
- present? 
+ lookup feature's (hash value % current size) in array
+ present?
    // Only do this if max hash size < U
    // Weinberger, Dasgupta, Langford, et. al. 2009
    // Helps 'balance out' collisions
@@ -142,15 +151,15 @@ to map feature -> index:
    set count to 1
    do not rehash if table is at max size
    rehash in case of collision or current capacity size reached
-     (create new table with 2x or 4x size (check hash), 
+     (create new table with 2x or 4x size (check hash),
       move to correct index based on true hash values)
    add the feature to array and return index
 
 
 to process document w:
   use previous hash table
-  feature -> index 
-  write to .dat: "w index" 
+  feature -> index
+  write to .dat: "w index"
   write rainbow table: "index  w:line_number  feature"
 
 generates a sparse matrix "data.dat"
@@ -159,18 +168,18 @@ data = spconvert(data)
 #+END_COMMENT
 
 #+BEGIN_COMMENT
-* Misc
+** Misc
 - `enron1/ham/2825.2000-11-13.farmer.ham.txt` "i believe texas should re - establish itself as a republic and i can go to the barricades . now that gets my juices going ."
 - 'New Mexico only appears in `spam/` in the enron1 dataset
 
-* Machine Learning!
+** Machine Learning!
 read files F1 (csvread)
 learn (SVM, ROSVM, SGD SVM, Naive Bayesian)
 evaluate model on files F2
 print evaluation (time, memory, error, regret, iterations)
 #+END_COMMENT
 
-* More Info on Datasets
+** More Info on Datasets
 enron, csmining, lingspam, and PU came from csmining.org
 
 Sources:
