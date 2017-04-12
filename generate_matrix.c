@@ -32,8 +32,8 @@ int write_row(int d, char* in_file, char* out_file,
         // Remove newline
         line[strcspn(line, "\n")] = '\0';
 
-        // Ignore empty lines
-        if (line[0] != '\0') {
+        // Ignore empty lines and lines that start with //
+        if (line[0] != '\0' || (line[0] == '/' && line[1] == '/')) {
             if (rainbow_table_file) {
                 fprintf(rainbow_fd, "%u    %s\n", hash(line), line);
             }
