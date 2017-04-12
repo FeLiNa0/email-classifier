@@ -142,7 +142,7 @@ int main(int c, char** v)
         if ((r = write_row(d, in_file, out_file, hash, vector, rainbow_table)) != 0) {
             return r;
         }
-        if (i % (b - a) == 0) {
+        if (i % ((b - a) / 10) == 0) {
             printf("Appended row %d from %s\n", i, in_file); 
         }
     }
