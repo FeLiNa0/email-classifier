@@ -11,19 +11,23 @@ def gen_T(n):
 def gen_hash(n):
     return """unsigned hash{0}(const char* s) {{
     unsigned h = 0;
-    for (int c = *s++; c; c = *s++) {{
-        h = T{0}[h ^ ({1} & c)];
+    for (int i = 0; s[i]; i += {2}) {{
+        h = T{0}[h ^ ({1} & (int)({3}))];
     }}
     return h;
-}}\n\n""".format(n, n - 1)
+}}\n\n""".format(2 ** n, 2 ** n - 1, 2 ** (n - 8),
+        " + ".join("s[i{}]".format(
+            '' if i == 0 else ' + ' + str(i)) 
+        for i in range(pow(2, (n - 8))))
+    )
 
 
 random.seed(0)
 with open('pearson.h','a') as p:
-    r = range(7, 13 + 1)
+    # Cannot be smaller than 8
+    r = range(8, 13 + 1)
     for n in r: 
-        print(2 ** n)
         p.write(gen_T(2 ** n))
 
     for n in r: 
-        p.write(gen_hash(2 ** n))
+        p.write(gen_hash(n))
