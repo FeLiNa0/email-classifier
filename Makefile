@@ -1,4 +1,5 @@
-feature_names = char char2 ngram word
+dimensions = 128 256 512 1024 2048 4096 8192
+feature_names = word ngram # char char2
 feature_dir = ../features
 feature_dirs = $(addprefix ${feature_dir}/, $(addsuffix _features, ${feature_names}))
 
@@ -25,13 +26,13 @@ generate_matrix: generate_matrix.c pearson.h
 # using Pearson's hashing function.
 n ?= 1024
 dense_matrix: generate_matrix
-	./generate_matrix dense ${feature_dir}/word_features/%d.features ${feature_dir}/word_features/out$n.csv $n 0 4326 reverse_hash$n ; \
+	./generate_matrix dense ${feature_dir}/word_features/%d.features ${feature_dir}/word_features/out$n.csv $n 0 4326 reverse_hash_word_$n ; \
 
 all_dense_matrices: generate_matrix
 	for d in ${feature_dirs}; do \
-	for n in 128 256 512 1024 2048 4096 8192; do \
+	for n in ${dimensions}; do \
 	echo $$d $$n; \
-	./generate_matrix dense $$d/%d.features $$d/out$$n.csv $$n 0 4326 reverse_hash$$n ; \
+	./generate_matrix dense $$d/%d.features $$d/out$$n.csv $$n 0 4326 $$d/reverse_hash$$n ; \
 	done ; \
 	done
 
@@ -42,7 +43,7 @@ sparse_matrix:
 all_matrices: all_dense_matrices all_sparse_matrices
 
 clean:
-	rm -f generate_matrix *reverse_hash* ${feature_dir}/*/*.csv 
+	rm -f generate_matrix *reverse_hash* ${feature_dir}/*/*.csv ${feature_dir}/*/*reverse_hash*
 
 clean_all: clean
 	rm -rf ${feature_dirs} 

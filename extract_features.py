@@ -98,11 +98,20 @@ def extract_features(fname_prefix, fname_suffix, email_fnames, label_file, param
 
 
 def ngrams(words, lengths, joiner=' '):
-    return [joiner.join(words[i + j]
-                        for j in range(n))
-            for i, c in enumerate(words)
-            for n in lengths if i + n < len(words) and words[i].lower() not in stop_words
-            ]
+    N = len(words)
+    if joiner == ' ':
+        return [joiner.join(words[i + j]
+                            for j in range(n) if words[i + j].lower() not in stop_words)
+                    for i in range(N)
+                for n in lengths if i + n < N
+        ]
+    else:
+        return [joiner.join(words[i + j]
+                            for j in range(n) if words[i + j])
+                    for i in range(N)
+                for n in lengths if i + n < N
+        ]
+
 
 
 def get_text(m):
@@ -197,14 +206,14 @@ params = [
         {'fname': 'char',
          'include_html': True,
          'case_insensitive': False,
-         'n_gram_lengths': [1, 8, 16],
+         'n_gram_lengths': [1, 4, 6],
          'normalize_whitespace': False,
          'by_character': True
         },
         {'fname': 'char2',
          'include_html': False,
          'case_insensitive': True,
-         'n_gram_lengths': [1, 4, 8],
+         'n_gram_lengths': [1, 2, 4],
          'normalize_whitespace': True,
          'by_character': True
         },
