@@ -1,5 +1,5 @@
-dimensions = 128 256 512 1024 2048 4096 8192
-feature_names = word ngram # char char2
+dimensions = 256 512 1024 2048 4096 8192
+feature_names = word ngram
 feature_dir = ../features
 feature_dirs = $(addprefix ${feature_dir}/, $(addsuffix _features, ${feature_names}))
 
@@ -17,7 +17,7 @@ features:
 
 # Compile matrix generator
 generate_matrix: generate_matrix.c pearson.h
-	gcc -O3 generate_matrix.c -o generate_matrix 
+	gcc -O3 cfarmhash/src/cfarmhash.c generate_matrix.c -o generate_matrix 
 
 # Run `make matrix_data`
 # Append all features from the given .features file to the CSV file.
