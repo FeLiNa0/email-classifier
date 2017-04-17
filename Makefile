@@ -38,7 +38,10 @@ all_dense_matrices: generate_matrix
 
 # Set n to any number between 1 and the number of unique features in the dataset
 sparse_matrix:
-	./generate_matrix sparse data/payload%d.features data/out$$n.csv $$n 0 4326 reverse_hash$$n ; \
+	# ./generate_matrix sparse data/payload%d.features data/out$$n.csv $$n 0 4326 reverse_hash$$n
+	# Use the prime numbers closest to 2E6 and 6E6
+	./generate_matrix sparse ../features/word_features/%d.features word_emails_2E6.dat 2000003 0 4326 reverse_hash2E6
+	./generate_matrix sparse ../features/ngram_features/%d.features ngram_emails_6E6.dat 6000010 0 4326 reverse_hash2E6
 
 all_matrices: all_dense_matrices all_sparse_matrices
 
