@@ -1,4 +1,5 @@
 #include <stdio.h> 
+#include <stdlib.h> 
 #include <stdbool.h> 
 #include <string.h> 
 #include <stdint.h>
@@ -176,7 +177,7 @@ int main(int c, char** v)
     }
 
     // Allocate a vector
-    int table[d];
+    int* table = malloc(d * sizeof(int));
 
     int r;
     char in_file[8192];
@@ -193,5 +194,6 @@ int main(int c, char** v)
     }
     printf("Finished writing %d rows to %s\n", b - a, out_file);
 
+    free(table);
     return 0;
 }
