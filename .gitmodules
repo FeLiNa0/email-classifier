@@ -1,0 +1,3 @@
+[submodule "cfarmhash"]
+	path = cfarmhash
+	url = https://github.com/fredrikwidlund/cfarmhash
